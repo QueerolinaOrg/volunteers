@@ -1,0 +1,354 @@
+<!--
+=============================================================
+  QUEEROLINA VOLUNTEER PORTAL
+  Drop this entire file into a Squarespace Code Block.
+
+  BEFORE YOU PASTE:
+  1. Replace YOUR_AIRTABLE_API_KEY with your new token (starts with pat...)
+  2. The baseId is already filled in for you.
+=============================================================
+-->
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+#qvp { padding: 2rem 0; font-family: inherit; max-width: 680px; margin: 0 auto; }
+#qvp .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+#qvp .brand-mark { width: 38px; height: 38px; border-radius: 50%; background: #1a1a1a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+#qvp .brand-mark span { color: #fff; font-size: 14px; font-weight: 600; }
+#qvp .brand-title { font-size: 18px; font-weight: 600; color: #1a1a1a; }
+#qvp .brand-sub { font-size: 12px; color: #888; margin-top: 1px; }
+#qvp .tabs { display: flex; border-bottom: 1px solid #e5e5e5; margin-bottom: 1.5rem; }
+#qvp .tab { padding: 8px 16px; font-size: 14px; cursor: pointer; border: none; border-bottom: 2px solid transparent; color: #888; background: none; font-family: inherit; transition: color 0.15s; }
+#qvp .tab.active { color: #1a1a1a; border-bottom-color: #1a1a1a; font-weight: 600; }
+#qvp .tab:hover:not(.active) { color: #1a1a1a; }
+#qvp .panel { display: none; }
+#qvp .panel.active { display: block; }
+#qvp .section-label { font-size: 11px; font-weight: 600; color: #aaa; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+#qvp .event-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 10px; }
+#qvp .event-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; gap: 10px; }
+#qvp .event-name { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+#qvp .event-meta { font-size: 12px; color: #888; margin-top: 2px; }
+#qvp .badge { display: inline-flex; align-items: center; font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+#qvp .badge-nasty { background: #1a1a1a; color: #fff; }
+#qvp .badge-q { background: #EEEDFE; color: #3C3489; }
+#qvp .shifts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#qvp .shift-slot { border: 1px solid #e8e8e8; border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+#qvp .shift-slot:hover:not(.full) { border-color: #bbb; background: #fafafa; }
+#qvp .shift-slot.full { opacity: 0.45; cursor: default; }
+#qvp .shift-role { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+#qvp .shift-time { font-size: 12px; color: #888; margin-top: 2px; }
+#qvp .shift-spots { font-size: 11px; margin-top: 6px; }
+#qvp .spots-open { color: #3B6D11; }
+#qvp .spots-full { color: #888; }
+#qvp .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 1rem; }
+#qvp .modal { background: #fff; border-radius: 12px; border: 1px solid #e8e8e8; padding: 1.5rem; width: 100%; max-width: 360px; }
+#qvp .modal-title { font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+#qvp .modal-sub { font-size: 13px; color: #888; margin-bottom: 1.25rem; }
+#qvp .field-label { font-size: 12px; color: #666; margin-bottom: 4px; display: block; }
+#qvp .field-input { width: 100%; padding: 9px 11px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; background: #fff; color: #1a1a1a; margin-bottom: 12px; }
+#qvp .field-input:focus { outline: none; border-color: #1a1a1a; }
+#qvp .modal-actions { display: flex; gap: 8px; margin-top: 4px; }
+#qvp .btn { padding: 9px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit; border: 1px solid #ddd; background: #fff; color: #1a1a1a; flex: 1; transition: background 0.15s; }
+#qvp .btn:hover { background: #f5f5f5; }
+#qvp .btn-primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+#qvp .btn-primary:hover { background: #333; }
+#qvp .btn-primary:disabled { opacity: 0.5; cursor: default; }
+#qvp .my-shift-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; margin-bottom: 8px; gap: 10px; }
+#qvp .my-shift-name { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+#qvp .my-shift-detail { font-size: 12px; color: #888; margin-top: 2px; }
+#qvp .status-pill { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+#qvp .pill-pending { background: #FAEEDA; color: #633806; }
+#qvp .pill-confirmed { background: #EAF3DE; color: #27500A; }
+#qvp .pill-denied { background: #FCEBEB; color: #791F1F; }
+#qvp .lookup-wrap { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+#qvp .lookup-wrap .field-input { margin-bottom: 0; flex: 1; }
+#qvp .empty-state { text-align: center; padding: 2rem 1rem; color: #888; font-size: 14px; line-height: 1.6; }
+#qvp .loading-state { text-align: center; padding: 1.5rem; color: #aaa; font-size: 13px; }
+#qvp .admin-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; gap: 10px; }
+#qvp .admin-row:last-child { border-bottom: none; }
+#qvp .admin-btn { font-size: 11px; padding: 5px 11px; border-radius: 8px; border: 1px solid #ddd; background: #fff; color: #1a1a1a; cursor: pointer; font-family: inherit; }
+#qvp .admin-btn:hover { background: #f5f5f5; }
+#qvp .admin-btn.confirm { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+#qvp .admin-btn.confirm:hover { background: #333; }
+#qvp .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: #1a1a1a; color: #fff; padding: 9px 18px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 99999; white-space: nowrap; }
+#qvp .toast.show { opacity: 1; }
+@media (max-width: 480px) { #qvp .shifts-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div id="qvp">
+  <div class="brand">
+    <div class="brand-mark"><span>Q</span></div>
+    <div>
+      <div class="brand-title">Volunteer Portal</div>
+      <div class="brand-sub">Queerolina LLC + Nasty Queer</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="qvpTab('shifts')">Open shifts</button>
+    <button class="tab" onclick="qvpTab('mine')">My shifts</button>
+    <button class="tab" onclick="qvpTab('admin')">Coordinator</button>
+  </div>
+
+  <div id="qvp-panel-shifts" class="panel active">
+    <p class="section-label">Upcoming events</p>
+    <div id="qvp-events-list"><div class="loading-state">Loading shifts...</div></div>
+  </div>
+
+  <div id="qvp-panel-mine" class="panel">
+    <p class="section-label">Look up your assignments</p>
+    <div class="lookup-wrap">
+      <input class="field-input" id="qvp-lookup-email" type="email" placeholder="your@email.com" />
+      <button class="btn btn-primary" onclick="qvpLookup()" style="flex:none;padding:9px 14px;">Look up</button>
+    </div>
+    <div id="qvp-my-list"><div class="empty-state">Enter your email to see your shifts.</div></div>
+  </div>
+
+  <div id="qvp-panel-admin" class="panel">
+    <p class="section-label">Pending confirmations</p>
+    <div id="qvp-admin-pending"><div class="loading-state">Loading...</div></div>
+    <p class="section-label" style="margin-top:1.5rem">All signups</p>
+    <div id="qvp-admin-all"><div class="loading-state">Loading...</div></div>
+  </div>
+
+  <div id="qvp-modal" style="display:none" class="modal-bg">
+    <div class="modal">
+      <div class="modal-title" id="qvp-modal-title"></div>
+      <div class="modal-sub" id="qvp-modal-sub"></div>
+      <label class="field-label">Your name</label>
+      <input class="field-input" id="qvp-modal-name" type="text" placeholder="e.g. Marcy Neon" />
+      <label class="field-label">Your email</label>
+      <input class="field-input" id="qvp-modal-email" type="email" placeholder="you@example.com" />
+      <div class="modal-actions">
+        <button class="btn" onclick="qvpCloseModal()">Cancel</button>
+        <button class="btn btn-primary" id="qvp-modal-submit" onclick="qvpSubmit()">Claim shift</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="qvp-toast"></div>
+</div>
+
+<script>
+(function() {
+
+  // ============================================================
+  //  PASTE YOUR CREDENTIALS HERE
+  // ============================================================
+  var API_KEY  = "YOUR_AIRTABLE_API_KEY";   // replace with your fresh pat... token
+  var BASE_ID  = "appD15VaIXg8DaOLD";       // your base ID (already filled in)
+  var T_SHIFTS  = "Shifts";
+  var T_SIGNUPS = "Signups";
+  // ============================================================
+
+  var pendingShiftId = null;
+
+  function url(table, extra) {
+    return "https://api.airtable.com/v0/" + BASE_ID + "/" + encodeURIComponent(table) + (extra || "");
+  }
+
+  function headers() {
+    return { "Authorization": "Bearer " + API_KEY, "Content-Type": "application/json" };
+  }
+
+  function get(table, params) {
+    return fetch(url(table, params ? "?" + params : ""), { headers: headers() }).then(function(r){ return r.json(); });
+  }
+
+  function post(table, fields) {
+    return fetch(url(table), { method: "POST", headers: headers(), body: JSON.stringify({ fields: fields }) }).then(function(r){ return r.json(); });
+  }
+
+  function patch(table, id, fields) {
+    return fetch(url(table, "/" + id), { method: "PATCH", headers: headers(), body: JSON.stringify({ fields: fields }) }).then(function(r){ return r.json(); });
+  }
+
+  function toast(msg) {
+    var t = document.getElementById("qvp-toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 2800);
+  }
+
+  function qvpTab(tab) {
+    document.querySelectorAll("#qvp .tab").forEach(function(t){ t.classList.remove("active"); });
+    document.querySelectorAll("#qvp .panel").forEach(function(p){ p.classList.remove("active"); });
+    document.querySelector("#qvp .tab[onclick=\"qvpTab('" + tab + "')\"]").classList.add("active");
+    document.getElementById("qvp-panel-" + tab).classList.add("active");
+    if (tab === "admin") loadAdmin();
+  }
+  window.qvpTab = qvpTab;
+
+  function loadEvents() {
+    Promise.all([
+      get(T_SHIFTS, "sort[0][field]=Event+Date&sort[0][direction]=asc"),
+      get(T_SIGNUPS, "")
+    ]).then(function(results) {
+      var shifts   = results[0].records || [];
+      var signups  = results[1].records || [];
+      var sigMap   = {};
+      signups.forEach(function(s){
+        var sid = s.fields["Shift ID"];
+        if (sid) sigMap[sid] = (sigMap[sid] || 0) + 1;
+      });
+      var evMap = {};
+      shifts.forEach(function(s){
+        var f   = s.fields;
+        var eid = f["Event ID"] || "unknown";
+        if (!evMap[eid]) evMap[eid] = { id: eid, name: f["Event Name"] || eid, date: f["Event Date"] || "", venue: f["Venue"] || "", brand: (f["Brand"] || "q").toLowerCase(), shifts: [] };
+        evMap[eid].shifts.push({ id: s.id, role: f["Role"] || "", time: f["Time"] || "", capacity: f["Capacity"] || 1, signups: sigMap[s.id] || 0 });
+      });
+      renderEvents(Object.values(evMap));
+    }).catch(function(){
+      document.getElementById("qvp-events-list").innerHTML = '<div class="empty-state">Could not load shifts. Check your API key and base ID.</div>';
+    });
+  }
+
+  function renderEvents(events) {
+    var el = document.getElementById("qvp-events-list");
+    if (!events.length) { el.innerHTML = '<div class="empty-state">No upcoming events yet.</div>'; return; }
+    el.innerHTML = events.map(function(ev){
+      return '<div class="event-card">' +
+        '<div class="event-header">' +
+          '<div><div class="event-name">' + ev.name + '</div><div class="event-meta">' + ev.date + (ev.venue ? ' · ' + ev.venue : '') + '</div></div>' +
+          '<span class="badge badge-' + (ev.brand === "nasty" ? "nasty" : "q") + '">' + (ev.brand === "nasty" ? "Nasty Queer" : "Queerolina") + '</span>' +
+        '</div>' +
+        '<div class="shifts-grid">' +
+          ev.shifts.map(function(sh){
+            var left = sh.capacity - sh.signups;
+            var full = left <= 0;
+            return '<div class="shift-slot' + (full ? ' full' : '') + '"' +
+              (full ? '' : ' onclick="qvpOpenModal(\'' + sh.id + '\',\'' + ev.name.replace(/'/g,"\\'") + '\',\'' + sh.role.replace(/'/g,"\\'") + '\',\'' + sh.time.replace(/'/g,"\\'") + '\')"') + '>' +
+              '<div class="shift-role">' + sh.role + '</div>' +
+              '<div class="shift-time">' + sh.time + '</div>' +
+              '<div class="shift-spots ' + (full ? 'spots-full' : 'spots-open') + '">' + (full ? 'full' : left + ' spot' + (left !== 1 ? 's' : '') + ' open') + '</div>' +
+              '</div>';
+          }).join('') +
+        '</div></div>';
+    }).join('');
+  }
+
+  function qvpOpenModal(shiftId, eventName, role, time) {
+    pendingShiftId = shiftId;
+    document.getElementById("qvp-modal-title").textContent = role;
+    document.getElementById("qvp-modal-sub").textContent = eventName + " · " + time;
+    document.getElementById("qvp-modal-name").value = "";
+    document.getElementById("qvp-modal-email").value = "";
+    var btn = document.getElementById("qvp-modal-submit");
+    btn.disabled = false;
+    btn.textContent = "Claim shift";
+    document.getElementById("qvp-modal").style.display = "flex";
+  }
+  window.qvpOpenModal = qvpOpenModal;
+
+  function qvpCloseModal() {
+    document.getElementById("qvp-modal").style.display = "none";
+    pendingShiftId = null;
+  }
+  window.qvpCloseModal = qvpCloseModal;
+
+  function qvpSubmit() {
+    var name  = document.getElementById("qvp-modal-name").value.trim();
+    var email = document.getElementById("qvp-modal-email").value.trim();
+    if (!name || !email) { toast("Please fill in both fields"); return; }
+    var btn = document.getElementById("qvp-modal-submit");
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+    post(T_SIGNUPS, { "Name": name, "Email": email, "Shift ID": pendingShiftId, "Status": "Pending" })
+      .then(function(){
+        qvpCloseModal();
+        toast("You're signed up! Ko will confirm your shift soon.");
+        loadEvents();
+      }).catch(function(){
+        btn.disabled = false;
+        btn.textContent = "Claim shift";
+        toast("Something went wrong. Please try again.");
+      });
+  }
+  window.qvpSubmit = qvpSubmit;
+
+  function qvpLookup() {
+    var email = document.getElementById("qvp-lookup-email").value.trim();
+    if (!email) { toast("Enter your email first"); return; }
+    var list = document.getElementById("qvp-my-list");
+    list.innerHTML = '<div class="loading-state">Looking up...</div>';
+    get(T_SIGNUPS, 'filterByFormula=LOWER({Email})="' + email.toLowerCase() + '"')
+      .then(function(data){
+        var records = data.records || [];
+        if (!records.length) { list.innerHTML = '<div class="empty-state">No shifts found for that email.<br>Double-check the address you signed up with.</div>'; return; }
+        var shiftIds = records.map(function(r){ return r.fields["Shift ID"]; }).filter(Boolean);
+        var shiftDetails = {};
+        Promise.all(shiftIds.map(function(sid){
+          return fetch("https://api.airtable.com/v0/" + BASE_ID + "/" + encodeURIComponent(T_SHIFTS) + "/" + sid, { headers: headers() })
+            .then(function(r){ return r.json(); })
+            .then(function(d){ if (d.fields) shiftDetails[sid] = d.fields; })
+            .catch(function(){});
+        })).then(function(){
+          list.innerHTML = records.map(function(r){
+            var f  = r.fields;
+            var sd = shiftDetails[f["Shift ID"]] || {};
+            var status = f["Status"] || "Pending";
+            var pillClass = status === "Confirmed" ? "pill-confirmed" : status === "Denied" ? "pill-denied" : "pill-pending";
+            return '<div class="my-shift-row">' +
+              '<div><div class="my-shift-name">' + (sd["Role"] || "Shift") + '</div>' +
+              '<div class="my-shift-detail">' + (sd["Event Name"] || "") + (sd["Time"] ? " · " + sd["Time"] : "") + '</div></div>' +
+              '<span class="status-pill ' + pillClass + '">' + status.toLowerCase() + '</span></div>';
+          }).join('');
+        });
+      }).catch(function(){
+        list.innerHTML = '<div class="empty-state">Error fetching shifts. Check your connection.</div>';
+      });
+  }
+  window.qvpLookup = qvpLookup;
+
+  function loadAdmin() {
+    get(T_SIGNUPS, "sort[0][field]=Created&sort[0][direction]=desc")
+      .then(function(data){
+        var records = data.records || [];
+        renderAdmin(records);
+      }).catch(function(){
+        document.getElementById("qvp-admin-pending").innerHTML = '<div class="empty-state">Error loading signups.</div>';
+      });
+  }
+
+  function renderAdmin(records) {
+    var pending = records.filter(function(r){ return (r.fields["Status"] || "Pending") === "Pending"; });
+    var pendingEl = document.getElementById("qvp-admin-pending");
+    var allEl     = document.getElementById("qvp-admin-all");
+
+    pendingEl.innerHTML = pending.length === 0
+      ? '<div class="empty-state" style="padding:0.75rem 0">All caught up — no pending signups.</div>'
+      : pending.map(function(r){
+          var f = r.fields;
+          return '<div class="admin-row">' +
+            '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#1a1a1a">' + f["Name"] + '</div>' +
+            '<div style="font-size:12px;color:#888">' + f["Email"] + ' · shift ID: ' + f["Shift ID"] + '</div></div>' +
+            '<button class="admin-btn" onclick="qvpUpdateStatus(\'' + r.id + '\',\'Denied\')">deny</button>' +
+            '<button class="admin-btn confirm" onclick="qvpUpdateStatus(\'' + r.id + '\',\'Confirmed\')">confirm</button>' +
+            '</div>';
+        }).join('');
+
+    allEl.innerHTML = records.length === 0
+      ? '<div class="empty-state" style="padding:0.75rem 0">No signups yet.</div>'
+      : records.map(function(r){
+          var f = r.fields;
+          var status = f["Status"] || "Pending";
+          var pillClass = status === "Confirmed" ? "pill-confirmed" : status === "Denied" ? "pill-denied" : "pill-pending";
+          return '<div class="admin-row">' +
+            '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#1a1a1a">' + f["Name"] + '</div>' +
+            '<div style="font-size:12px;color:#888">' + f["Email"] + '</div></div>' +
+            '<span class="status-pill ' + pillClass + '">' + status.toLowerCase() + '</span></div>';
+        }).join('');
+  }
+
+  function qvpUpdateStatus(recordId, status) {
+    patch(T_SIGNUPS, recordId, { "Status": status })
+      .then(function(){ toast(status === "Confirmed" ? "Confirmed!" : "Removed"); loadAdmin(); })
+      .catch(function(){ toast("Error updating status."); });
+  }
+  window.qvpUpdateStatus = qvpUpdateStatus;
+
+  loadEvents();
+
+})();
+</script>
