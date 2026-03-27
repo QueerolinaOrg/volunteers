@@ -293,8 +293,10 @@ body.nq .pf a{color:var(--nq-pink);}
   <div class="mo">
     <div class="mti" id="mti"></div>
     <div class="msu" id="msu"></div>
+<div id="mdesc" style="display:none;font-size:13px;line-height:1.6;padding:10px 12px;border-radius:10px;margin-bottom:1rem;background:var(--q-bg);border:1.5px solid var(--q-border);color:var(--q-muted);font-weight:600;"></div>
     <label class="fl">Your name</label><input class="fi" id="mn" type="text" placeholder="e.g. Marcy Neon"/>
-    <label class="fl">Your email</label><input class="fi" id="me" type="email" placeholder="you@example.com"/>
+   <label class="fl">Your email</label><input class="fi" id="me" type="email" placeholder="you@example.com"/>
+<label class="fl">Your phone number</label><input class="fi" id="mph" type="tel" placeholder="(919) 555-0123"/>
     <div class="mac"><button class="btn" onclick="closeM()">Cancel</button><button class="btn bp" id="msb" onclick="submitS()">Claim shift</button></div>
   </div>
 </div>
@@ -372,7 +374,8 @@ document.getElementById("modal").style.display="flex";}
 window.openM=openM;
 function closeM(){document.getElementById("modal").style.display="none";psid=null;}window.closeM=closeM;
 function submitS(){var n=document.getElementById("mn").value.trim(),e=document.getElementById("me").value.trim();if(!n||!e){showT("Please fill in both fields");return;}var b=document.getElementById("msb");b.disabled=true;b.textContent="Saving...";
-post(TG,{fields:{"Name":n,"Email":e,"Shift ID":psid,"Status":"Pending"}}).then(function(){closeM();showT("You are signed up! Ko will confirm soon");loadEvents();}).catch(function(){b.disabled=false;b.textContent="Claim shift";showT("Something went wrong.");});}
+var ph=document.getElementById("mph").value.trim();
+post(TG,{fields:{"Name":n,"Email":e,"Phone":ph,"Shift ID":psid,"Status":"Pending"}}).then(function(){closeM();showT("You are signed up! Ko will confirm soon");loadEvents();}).catch(function(){b.disabled=false;b.textContent="Claim shift";showT("Something went wrong.");});}
 window.submitS=submitS;
 function lookupMyShifts(){var email=document.getElementById("lue").value.trim();if(!email){showT("Enter your email first");return;}var list=document.getElementById("msl");list.innerHTML='<div class="ls">Looking up</div>';
 get(TG,'filterByFormula=LOWER({Email})="'+email.toLowerCase()+'"').then(function(data){var r=data.records||[];if(!r.length){list.innerHTML='<div class="es">No shifts found for that email.</div>';return;}
