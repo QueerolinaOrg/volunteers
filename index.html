@@ -349,6 +349,7 @@ return '<div class="ec"><div class="eh"><div><div class="en">'+ev.name+'</div><d
 ev.shifts.map(function(s){var l=s.capacity-s.signups,f=l<=0;
 return '<div class="ss'+(f?' full':'')+'"'+(f?'':' onclick="openM(\''+s.id+'\')"')+'>'+ 
 '<div class="sr">'+s.role+'</div><div class="st">'+s.time+'</div>'+
+(s.desc?'<div class="sdesc">'+s.desc+'</div>':'')+
 '<div class="sp '+(f?'sf':'so')+'">'+(f?'full':l+' spot'+(l!==1?'s':'')+' open')+'</div></div>';
 }).join('')+'</div></div>';}).join('');}
 var curEv="",curRo="",curTi="";
@@ -363,6 +364,8 @@ var time=found?found.querySelector(".st").textContent:"";
 var evName=found?found.closest(".ec").querySelector(".en").textContent:"Event";
 document.getElementById("mti").textContent=role;
 document.getElementById("msu").textContent=evName+" \u00b7 "+time;
+var descEl=document.getElementById("mdesc");
+if(descEl){var found2=document.querySelector(".ss:not(.full)[onclick*='"+id+"']");var desc=found2?found2.querySelector(".sdesc"):null;descEl.style.display=desc&&desc.textContent?"block":"none";if(desc)descEl.textContent=desc.textContent;}
 document.getElementById("mn").value="";document.getElementById("me").value="";
 var b=document.getElementById("msb");b.disabled=false;b.textContent="Claim shift";
 document.getElementById("modal").style.display="flex";}
@@ -381,7 +384,7 @@ window.lookupMyShifts=lookupMyShifts;
 function loadSM(){var el=document.getElementById("sml");el.innerHTML='<div class="ls">Loading</div>';
 Promise.all([get(TS),get(TG)]).then(function(res){var sh=res[0].records||[],si=res[1].records||[];var sm={};si.forEach(function(s){var sid=s.fields["Shift ID"];if(sid)sm[sid]=(sm[sid]||0)+1;});
 if(!sh.length){el.innerHTML='<div class="es">No shifts yet. Add one below!</div>';return;}
-var ev={};sh.forEach(function(s){var f=s.fields,eid=f["Event ID"]||"x";if(!ev[eid])ev[eid]={name:f["Event Name"]||eid,brand:f["Brand"]||"",shifts:[]};ev[eid].shifts.push({id:s.id,role:f["Role"]||"",time:f["Time"]||"",capacity:f["Capacity"]||1,signups:sm[s.id]||0});});
+var ev={};sh.forEach(function(s){var f=s.fields,eid=f["Event ID"]||"x";if(!ev[eid])ev[eid]={name:f["Event Name"]||eid,brand:f["Brand"]||"",shifts:[]};ev[eid].shifts.push({id:s.id,role:f["Role"]||"",time:f["Time"]||"",desc:f["Description"]||"",capacity:f["Capacity"]||1,signups:sm[s.id]||0});});
 el.innerHTML=Object.values(ev).map(function(e){return '<div class="smc"><div class="egl">'+e.name+' &mdash; '+e.brand+'</div>'+e.shifts.map(function(s){var f=s.signups>=s.capacity;return '<div class="smr"><div style="flex:1"><div class="smn">'+s.role+'</div><div class="smm">'+s.time+'</div></div><span class="sct '+(f?'cfu':'cok')+'">'+s.signups+'/'+s.capacity+'</span><div class="aa"><button class="ab dn" onclick="rmS(\''+s.id+'\')">remove</button></div></div>';}).join('')+'</div>';}).join('');
 }).catch(function(){el.innerHTML='<div class="es">Error loading shifts.</div>';});}
 function toggleAdd(){var f=document.getElementById("asf");f.style.display=f.style.display==="none"?"block":"none";}window.toggleAdd=toggleAdd;
